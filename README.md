@@ -1,4 +1,4 @@
-#Crypto Altcoin Trading Bot
+# Crypto Altcoin Trading Bot
 
 This bot automatically executes trades between BTC and user-specified altcoins to try and realize maximum returns. It operates on the following assumptions: 
 
@@ -12,7 +12,7 @@ This bot depends on some degree of technical analysis, sentiment analysis, and u
 All trades are executed on the Binance exchange.
 
 
-##Trading Mechanics
+## Trading Mechanics
 
 This bot relies on three main indicators to decide whether to perform a buy, sell, or no trade. These are: 
 
@@ -30,7 +30,7 @@ Persistence is ensured by two comma-separated vector files which are automatical
 
 Note: This bot tries to maximize reliance on the Binance API to ensure data integrity, but does rely on the CoinMarketCap API for the BTC dominance figure and on alternative.me for the fear/greed index value.
 
-##Config
+## Config
 
 In the config directory, a config.json file must be provided. It must include (in JSON format):
 
@@ -41,7 +41,7 @@ In the config directory, a config.json file must be provided. It must include (i
 
 A sample config file is provided. The bot assumes a correct config file.  
 
-##Performance
+## Performance
 
 To measure the success of this bot, we look at the percentage gain/loss of the total portfolio value at any given time compared to the value of the initial investment. 
 
