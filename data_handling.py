@@ -14,27 +14,15 @@ with open('config/config.json', 'r') as config:
     cmc_api = configs["cmc"]
 
 def main():
-    pass
+    print(get_fear_index_change_nominal('m'))
 
 def get_timestamp(days_ago):
     timest = dt.datetime.now()-dt.timedelta(days=days_ago)
     timestamp = timest.timestamp() * 1000
-    return timestamp
+    return str(timestamp)
 
-def get_3day_sma(ticker):
-    timestamp = get_timestamp(3)
-    return get_moving_average(ticker,'1h',timestamp)
-
-def get_30day_sma(ticker):
-    timestamp = get_timestamp(30)
-    return get_moving_average(ticker,'1h',timestamp)
-
-def get_200day_sma(ticker):
-    timestamp = get_timestamp(200)
-    return get_moving_average(ticker,'1h',timestamp)
-
-def get_7day_sma(ticker):
-    timestamp = get_timestamp(7)
+def get_sma(days, ticker):
+    timestamp = get_timestamp(days)
     return get_moving_average(ticker,'1h',timestamp)
 
 def get_daily_sma(ticker):
@@ -43,7 +31,7 @@ def get_daily_sma(ticker):
 
 def get_current_price(ticker):
     candle = client.get_klines(symbol=ticker, interval=Client.KLINE_INTERVAL_1MINUTE)
-    return candle[4] #or candle[1][1] 
+    return float(candle[-1][1]) #or candle[1][1] 
 
 def get_moving_average(symbol, interval, starttime):
     bars = client.get_historical_klines(symbol, interval, starttime)
@@ -53,7 +41,8 @@ def get_moving_average(symbol, interval, starttime):
     total_nominal = 0
     total_periods = 0
     for b in bars:
-        total_nominal += b['close']
+        #print(b)
+        total_nominal += float(b[4])
         total_periods += 1
     return total_nominal/total_periods
 
@@ -104,7 +93,7 @@ def get_fear_index_change(period):
     elif period == 'm':
         old_val = get_fear_index_period('m')
     new_val = get_fear_index()
-    return (old_val-new_val)/old_val
+    return (float(new_val)-float(old_val))/float(old_val)
 
 def get_fear_index_change_nominal(period):
     #w = week, d=day, m=month
@@ -115,16 +104,18 @@ def get_fear_index_change_nominal(period):
     elif period == 'm':
         old_val = get_fear_index_period('m')
     new_val = get_fear_index()
-    return new_val-old_val
+    return float(new_val)-float(old_val)
 
 def get_account_balance_USD():
-    info = client.get_account()
-    balances = info["balances"]
+    balances = get_asset_balances()
     balance_USD = 0
     for coin in balances:
+        if coin == "USDT":
+            continue
         ticker = coin["asset"]
-        total = coin["free"] + coin["locked"]
-        symbol = ticker+"USDT"
+        total = float(coin["free"]) + float(coin["locked"])
+        print(total)
+        symbol = ticker+"BUSD"
         price = get_current_price(symbol)
         balance_USD += price * total
     return balance_USD
@@ -132,7 +123,13 @@ def get_account_balance_USD():
 def get_asset_balances():
     info = client.get_account()
     balances = info["balances"]
-    return balances
+    result = []
+    for b in balances:
+        if float(b['free']) == float(b['locked']) == 0.0:
+            continue
+        else:
+            result.append(b)
+    return result
 
 def get_asset_free_balance(ticker):
     info = client.get_account()
@@ -157,8 +154,8 @@ def get_avg_buy_price(alt):
         reader= csv.reader(t)
         for row in reader:
             if row[0] == alt and row[1] == "buy":
-                total_paid += int(row[2])
-                qty += int(row[3])
+                total_paid += int(row[3])
+                qty += int(row[4])
     return total_paid/qty
 
 

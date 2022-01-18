@@ -78,14 +78,14 @@ def buy():
     #if BTC dominance up, price up or sideways, and strong movement towards greed
     #add 30 day sma?
     if (d.get_btc_dominance_change() > 0 
-    and d.get_current_price("BTCUSDT") - d.get_30day_sma("BTCUSDT") > 0 
+    and d.get_current_price("BTCUSDT") - d.get_sma(30, "BTCUSDT") > 0 
     and (d.get_fear_index_change_nominal("d") > 20 or d.get_fear_index_change_nominal("w") > 20)):
         return True
     return False
 
 def sell():
     if (d.get_btc_dominance_change() < 0 
-    and d.get_current_price("BTCUSDT") - d.get_30day_sma("BTCUSDT") < 0 
+    and d.get_current_price("BTCUSDT") - d.get_sma(30,"BTCUSDT") < 0 
     and (d.get_fear_index_change_nominal("d") < -20 or d.get_fear_index_change_nominal("w") < -20)):
         return True
     return False
@@ -120,7 +120,7 @@ def get_relative_prices():
     relative_prices = {}
     for alt in alts:
         symbol = alt+"BTC"
-        relative_prices[alt] = (d.get_current_price(symbol) - d.get_30day_sma(symbol))/d.get_30day_sma(symbol)
+        relative_prices[alt] = (d.get_current_price(symbol) - d.get_sma(30, symbol))/d.get_sma(30, symbol)
     return relative_prices
 
 def choose_alt_sell():
