@@ -23,8 +23,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--t', required=False, dest='t', action='store_true', help="use --t flag for testing mode (transactions are not sent to Binance API)")
     args = parser.parse_args()
+    print(choose_alt_sell())
     while True:
-        trade(args.t)
+        trade(args.t) 
         report()
         time.sleep(120)
 
@@ -134,7 +135,7 @@ def get_last_24h(buy_or_sell):
 
 def choose_alt_buy():
     global next_buytime
-    prices = get_relative_prices()
+    prices = get_relative_prices(alts)
     #remove alts that have trades in the last 24 hrs 
     rm = get_last_24h("buy")
     #rate limiting
@@ -156,19 +157,28 @@ def choose_alt_buy():
         if value == target:
             return key
 
-def get_relative_prices():
+def get_relative_prices(altlist):
+    if len(altlist) == 0:
+        return {}
     relative_prices = {}
-    for alt in alts:
+    for alt in altlist:
         symbol = alt+"BTC"
         sma = d.get_sma(30, symbol)
         relative_prices[alt] = (d.get_current_price(symbol) - sma)/sma
     return relative_prices
 
 def choose_alt_sell():
-    prices = get_relative_prices()
-    target = max(prices.values())
+    owned = d.get_asset_balances()
+    owned_list = []
+    for coin in owned:
+        if coin["asset"] != "BTC" and coin["asset"] != "USDT":
+            owned_list.append(coin["asset"])
+    if len(owned_list) == 0:
+        return None
+    prices = get_relative_prices(owned_list)
     for key in get_last_24h("sell"):
         del prices[key]
+    target = max(prices.values())
     while True:
         for key, value in prices.items():
             if value == target:
