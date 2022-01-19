@@ -23,7 +23,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--t', required=False, dest='t', action='store_true', help="use --t flag for testing mode (transactions are not sent to Binance API)")
     args = parser.parse_args()
-    print(choose_alt_sell())
     while True:
         trade(args.t) 
         report()
@@ -103,14 +102,14 @@ def buy():
     #if BTC dominance up, price up or sideways, and strong movement towards greed
     #add 30 day sma?
     if (d.get_btc_dominance_change() > 0 
-    and d.get_current_price("BTCUSDT") - d.get_sma(30, "BTCUSDT") > 0 
+    and d.get_current_price("BTCUSDT") - d.get_sma(7, "BTCUSDT") > 0 
     and (d.get_fear_index_change_nominal("d") > 20 or d.get_fear_index_change_nominal("w") > 20)):
         return True
     return False
 
 def sell():
     if (d.get_btc_dominance_change() < 0 
-    and d.get_current_price("BTCUSDT") - d.get_sma(30,"BTCUSDT") < 0 
+    and d.get_current_price("BTCUSDT") - d.get_sma(7,"BTCUSDT") < 0 
     and (d.get_fear_index_change_nominal("d") < -20 or d.get_fear_index_change_nominal("w") < -20)):
         return True
     return False
