@@ -5,6 +5,7 @@ import datetime as dt
 from binance.client import Client 
 import os 
 import time
+import math
 
 with open('config/config.json', 'r') as config:
     configs = json.load(config)
@@ -12,18 +13,21 @@ with open('config/config.json', 'r') as config:
     alts = configs["alts"]
 
 starting_amt_btc = 0
+next_buytime = 0
 
 def main():
-    while True:
-        trade()
-        report()
-        time.sleep(60)
+    print(choose_alt_buy())
+    print(choose_alt_sell())
+    #while True:
+    #    trade()
+    #    report()
+    #    time.sleep(60)
 
 def report():
     init_report()
     time = dt.datetime.now.strftime("%d/%m/%Y %H:%M:%S")
     value_of_portfolio = d.get_account_balance_USD()
-    value_of_btc = starting_amt_btc * d.get_current_price("BTC")
+    value_of_btc = starting_amt_btc * d.get_current_price("BTCBUSD")
     gain = ((value_of_portfolio - value_of_btc)/value_of_btc)*100
     with open("portfolio_value.csv", 'a') as pv:
         writer =csv.DictWriter(pv, fieldnames = ["time", "portfolio value", "value of initial investment", "percentage gain/loss"])
@@ -56,6 +60,7 @@ def trade():
             order_qty=btc_qty/price
             order = client.order_limit_buy(symbol=symbol,quantity=order_qty,price=price)
             d.log_transaction(alt, "buy", price, btc_qty, order_qty)
+            next_buytime = dt.datetime.now() + dt.timedelta(minutes=15)
     elif sell():
         alt = choose_alt_sell()
         if alt is None:
@@ -90,12 +95,14 @@ def sell():
         return True
     return False
 
-def get_last_24h_buys():
+def get_last_24h(buy_or_sell):
+    if not os.path.exists("transactions.log"):
+        return []
     with open("transactions.log", 'r') as t:
         alts = []
         reader = csv.reader(t)
         for row in reversed(list(reader)):
-            if row[1] != "buy":
+            if row[1] != buy_or_sell:
                 continue
             time = row[-1]
             time_obj = dt.datetime.striptime(time, "%d/%m/%Y %H:%M:%S")
@@ -109,10 +116,23 @@ def get_last_24h_buys():
 def choose_alt_buy():
     prices = get_relative_prices()
     #remove alts that have trades in the last 24 hrs 
-    for key in get_last_24h_buys():
+    rm = get_last_24h("buy")
+    #rate limiting
+    tdelta = last_buy_timestamp - dt.datetime.now().timestamp()
+    if next_buytime != 0:
+        if dt.datetime.now() < next_buytime:
+            return None
+    #mechanism for not buying asset in freefall (3 red days)
+    for key, val in prices.items():
+        symbol = key+"BTC"
+        if d.get_sma(3, symbol) > d.get_sma(2, symbol) > d.get_sma(1, symbol):
+            rm.append(key)
+    #remove unwanted buys 
+    for key in rm:
         del prices[key]
+    #find best prices buy option
     target = min(prices.values())
-    for key, value in prices:
+    for key, value in prices.items():
         if value == target:
             return key
 
@@ -126,15 +146,17 @@ def get_relative_prices():
 def choose_alt_sell():
     prices = get_relative_prices()
     target = max(prices.values())
+    for key in get_last_24h("sell"):
+        del prices[key]
     while True == True:
         for key, value in prices.items():
             if value == target:
-                if d.get_current_price(key) > d.get_avg_buy_price(key):
+                if d.get_current_price(key+"BTC") > d.get_avg_buy_price(key):
                     return key
                 else:
-                    prices[key] = -100000000
+                    prices[key] = -math.inf
                     target = max(prices.values())
-        if prices.values().count(-100000000) == len(prices.values()):
+        if prices.values().count(-math.inf) == len(prices.values()):
             return None
 
 

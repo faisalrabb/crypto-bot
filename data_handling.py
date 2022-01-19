@@ -6,6 +6,7 @@ import requests
 import json
 import datetime as dt
 import csv
+import math
 
 with open('config/config.json', 'r') as config:
     configs = json.load(config)
@@ -31,7 +32,7 @@ def get_daily_sma(ticker):
 
 def get_current_price(ticker):
     candle = client.get_klines(symbol=ticker, interval=Client.KLINE_INTERVAL_1MINUTE)
-    return float(candle[-1][1]) #or candle[1][1] 
+    return float(candle[-1][1]) 
 
 def get_moving_average(symbol, interval, starttime):
     bars = client.get_historical_klines(symbol, interval, starttime)
@@ -148,6 +149,8 @@ def get_asset_locked_balance(ticker):
     return None
 
 def get_avg_buy_price(alt):
+    if not os.path.exists("transactions.log"):
+        return -math.inf
     total_paid = 0
     qty = 0
     with open("transactions.log", 'r') as t:
