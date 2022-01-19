@@ -6,22 +6,27 @@ from binance.client import Client
 import os 
 import time
 import math
+import argparse
 
 with open('config/config.json', 'r') as config:
     configs = json.load(config)
     client = Client(configs["api"], configs["secret"])
     alts = configs["alts"]
 
+#set the starting BTC investment given to the bot (for reporting purposes - see gain/loss by the bot against if you had just HODLed). This is of course optional, but if no value is supplied the report() function should be removed
 starting_amt_btc = 0
+#rate limiting buys and reports - don't touch these. 
 next_buytime = 0
 next_report = 0
 
 def main():
-    pass
-    #while True:
-    #    trade()
-    #    report()
-    #    time.sleep(60)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--t', required=False, dest='t', action='store_true', help="use --t flag for testing mode (transactions are not sent to Binance API)")
+    args = parser.parse_args()
+    while True:
+        trade(args.t)
+        report()
+        time.sleep(120)
 
 def report():
     global next_report
@@ -50,7 +55,7 @@ def init_report():
         writer.writeheader()
 
 
-def trade():
+def trade(test_mode):
     global next_buytime
     if buy():
         alt = choose_alt_buy()
@@ -61,12 +66,16 @@ def trade():
             qty = d.get_asset_free_balance("BTC")
             #btc_price = d.get_current_price("BTCUSDT")
             #default buy amt is minimum transaction value of 0.0001 btc 
-            if qty < 0.0001:
+            if qty < 0.00011:
                 return
             else:
-                btc_qty = 0.0001
+                btc_qty = 0.00011
             price = d.get_current_price(symbol)
-            order_qty=btc_qty/price
+            order_qty=round(btc_qty/price,5)
+            if test_mode:
+                print(alt, order_qty, price)
+                #TODO: test logs 
+                return
             order = client.order_limit_buy(symbol=symbol,quantity=order_qty,price=price)
             print(order)
             d.log_transaction(alt, "buy", price, btc_qty, order_qty)
@@ -78,13 +87,13 @@ def trade():
         else:
             symbol = alt+"BTC"
             qty = d.get_asset_free_balance(alt)
-            order_qty = qty/2
+            order_qty = round(qty/2,5)
             price = d.get_current_price(symbol)
             if price * order_qty < 0.0001:
                 if price * qty < 0.0001:
                     return
                 else:
-                    order_qty = 0.0001/price
+                    order_qty = round(0.0001/price,5)
             order = client.limit_order_sell(symbol=symbol, quantity=order_qty, price=price)
             d.log_transaction(alt,"sell",price, (price * order_qty), order_qty)
 
@@ -132,10 +141,9 @@ def choose_alt_buy():
     if next_buytime != 0:
         if dt.datetime.now() < next_buytime:
             return None
-    #TODO :mechanism for not buying asset in freefall (required? revisit after deployment)
+    #TODO :mechanism for not buying asset in freefall (possible? Relative Strength Index?)
     #for key in prices.keys():
-    #    symbol = key+"BTC"
-    #    if in_freefall(symbol):
+    #    if d.in_freefall(key):
     #        rm.append(key)
     #remove unwanted buys 
     if len(rm) == len(prices):
@@ -148,12 +156,12 @@ def choose_alt_buy():
         if value == target:
             return key
 
-
 def get_relative_prices():
     relative_prices = {}
     for alt in alts:
         symbol = alt+"BTC"
-        relative_prices[alt] = (d.get_current_price(symbol) - d.get_sma(30, symbol))/d.get_sma(30, symbol)
+        sma = d.get_sma(30, symbol)
+        relative_prices[alt] = (d.get_current_price(symbol) - sma)/sma
     return relative_prices
 
 def choose_alt_sell():
@@ -161,7 +169,7 @@ def choose_alt_sell():
     target = max(prices.values())
     for key in get_last_24h("sell"):
         del prices[key]
-    while True == True:
+    while True:
         for key, value in prices.items():
             if value == target:
                 if d.get_current_price(key+"BTC") > d.get_avg_buy_price(key):

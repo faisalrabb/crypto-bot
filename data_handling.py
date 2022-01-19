@@ -47,6 +47,31 @@ def get_moving_average(symbol, interval, starttime):
         total_periods += 1
     return total_nominal/total_periods
 
+#to reduce API calls 
+def calculate_moving_average(bars, days):
+    #assuming hourly klines
+    num_bars = days * 24
+    total_nominal = 0
+    total_periods = 0 
+    for b in bars[-num_bars:]:
+        total_nominal += float(b[4])
+        total_periods += 1
+    return total_nominal/total_periods
+
+#validity testing required for this function
+#def in_freefall(alt):
+#    bars = client.get_historical_klines(alt+"BTC", '1h', get_timestamp(3))
+#    sma = []
+#    for i in range(1,4):
+#        sma.append(calculate_moving_average(bars, i))
+#    for i in range(1, len(sma)):
+#        if sma[i] < sma[i-1]:
+#            return False
+#    if get_current_price(alt+"BTC") > sma[0]:
+#        return False
+#    return True
+    
+
 
 def get_metrics_latest():
     headers = {
