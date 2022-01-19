@@ -14,17 +14,24 @@ with open('config/config.json', 'r') as config:
 
 starting_amt_btc = 0
 next_buytime = 0
+next_report = 0
 
 def main():
-    print(choose_alt_buy())
-    print(choose_alt_sell())
+    pass
     #while True:
     #    trade()
     #    report()
     #    time.sleep(60)
 
 def report():
+    global next_report
+    global starting_amt_btc
     init_report()
+    if next_report != 0:
+        if dt.datetime.now() < next_report:
+            return
+    if not os.path.exists("transactions.log"):
+        return
     time = dt.datetime.now.strftime("%d/%m/%Y %H:%M:%S")
     value_of_portfolio = d.get_account_balance_USD()
     value_of_btc = starting_amt_btc * d.get_current_price("BTCBUSD")
@@ -33,6 +40,7 @@ def report():
         writer =csv.DictWriter(pv, fieldnames = ["time", "portfolio value", "value of initial investment", "percentage gain/loss"])
         row = {'time': time, 'portfolio value': value_of_portfolio, 'value of initial investment': value_of_btc, 'percentage gain/loss': gain}
         writer.writerow(row)
+    next_report = dt.datetime.now() + dt.timedelta(minutes=10)
         
 def init_report():
     if os.path.exists("portfolio_value.csv"):
@@ -43,6 +51,7 @@ def init_report():
 
 
 def trade():
+    global next_buytime
     if buy():
         alt = choose_alt_buy()
         if alt is None:
@@ -59,6 +68,7 @@ def trade():
             price = d.get_current_price(symbol)
             order_qty=btc_qty/price
             order = client.order_limit_buy(symbol=symbol,quantity=order_qty,price=price)
+            print(order)
             d.log_transaction(alt, "buy", price, btc_qty, order_qty)
             next_buytime = dt.datetime.now() + dt.timedelta(minutes=15)
     elif sell():
@@ -114,20 +124,22 @@ def get_last_24h(buy_or_sell):
     return alts
 
 def choose_alt_buy():
+    global next_buytime
     prices = get_relative_prices()
     #remove alts that have trades in the last 24 hrs 
     rm = get_last_24h("buy")
     #rate limiting
-    tdelta = last_buy_timestamp - dt.datetime.now().timestamp()
     if next_buytime != 0:
         if dt.datetime.now() < next_buytime:
             return None
-    #mechanism for not buying asset in freefall (3 red days)
-    for key, val in prices.items():
-        symbol = key+"BTC"
-        if d.get_sma(3, symbol) > d.get_sma(2, symbol) > d.get_sma(1, symbol):
-            rm.append(key)
+    #TODO :mechanism for not buying asset in freefall (required? revisit after deployment)
+    #for key in prices.keys():
+    #    symbol = key+"BTC"
+    #    if in_freefall(symbol):
+    #        rm.append(key)
     #remove unwanted buys 
+    if len(rm) == len(prices):
+        return None
     for key in rm:
         del prices[key]
     #find best prices buy option
@@ -135,6 +147,7 @@ def choose_alt_buy():
     for key, value in prices.items():
         if value == target:
             return key
+
 
 def get_relative_prices():
     relative_prices = {}
