@@ -14,18 +14,26 @@ with open('config/config.json', 'r') as config:
     alts = configs["alts"]
 
 #set the starting BTC investment given to the bot (for reporting purposes - see gain/loss by the bot against if you had just HODLed). This is of course optional, but if no value is supplied the report() function should be removed
-starting_amt_btc = 0
+starting_amt_btc = 0.00189
 #rate limiting buys and reports - don't touch these. 
 next_buytime = 0
 next_report = 0
+#auto-start function while waiting for initial BTC buy order to fill - don't touch
+start_trading = False 
 
 def main():
+    global start_trading
     parser = argparse.ArgumentParser()
     parser.add_argument('--t', required=False, dest='t', action='store_true', help="use --t flag for testing mode (transactions are not sent to Binance API)")
     args = parser.parse_args()
     while True:
-        trade(args.t) 
-        report()
+        if start_trading == False:
+            balances = d.get_asset_balances()
+            if len(balances) != 0:
+                start_trading = True
+        else:
+            trade(args.t) 
+            report()
         time.sleep(120)
 
 def report():
