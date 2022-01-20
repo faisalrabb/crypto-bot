@@ -100,17 +100,16 @@ def trade(test_mode):
 
 def buy():
     #if BTC dominance up, price up or sideways, and strong movement towards greed
-    #add 30 day sma?
     if (d.get_btc_dominance_change() > 0 
     and d.get_current_price("BTCUSDT") - d.get_sma(7, "BTCUSDT") > 0 
-    and (d.get_fear_index_change_nominal("d") > 20 or d.get_fear_index_change_nominal("w") > 20)):
+    and (d.get_fear_index_change_nominal("d") >= 10 or d.get_fear_index_change_nominal("w") >= 20)):
         return True
     return False
 
 def sell():
     if (d.get_btc_dominance_change() < 0 
     and d.get_current_price("BTCUSDT") - d.get_sma(7,"BTCUSDT") < 0 
-    and (d.get_fear_index_change_nominal("d") < -20 or d.get_fear_index_change_nominal("w") < -20)):
+    and (d.get_fear_index_change_nominal("d") <= -10 or d.get_fear_index_change_nominal("w") <= -20)):
         return True
     return False
 
