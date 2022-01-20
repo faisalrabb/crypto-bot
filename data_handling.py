@@ -121,6 +121,7 @@ def get_fear_index_change(period):
     new_val = get_fear_index()
     return (float(new_val)-float(old_val))/float(old_val)
 
+#TODO: transition from webscraping approach to API calls for higher number of periods (between 1-7 days)
 def get_fear_index_change_nominal(period):
     #w = week, d=day, m=month
     if period == 'd':
@@ -188,6 +189,7 @@ def get_avg_buy_price(alt):
 
 
 def log_transaction(alt, side, price_btc, quantity_btc, quantity_alt):
+    print(alt + " " + side + " "+ str(price_btc) + " " + str(quantity_btc)"BTC " + quantity_alt+alt)
     #buy side quantity_btc = total btc sold, quantity_alt = total alt received
     #sell side quantity_btc = total btc received, quantity_alt = total alt sold
     side = side.lower()
