@@ -152,6 +152,8 @@ def get_asset_balances():
     balances = info["balances"]
     result = []
     for b in balances:
+        if b['asset'] == "USDT" or b['asset'] == "BUSD":
+            continue
         if float(b['free']) == float(b['locked']) == 0.0:
             continue
         else:
