@@ -78,7 +78,7 @@ def trade(test_mode):
             if qty < 0.00011:
                 return
             else:
-                btc_qty = 0.00011
+                btc_qty = 0.0001100
             price = d.get_current_price(symbol)
             order_qty=round(btc_qty/price,5)
             if test_mode:
