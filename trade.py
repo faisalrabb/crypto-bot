@@ -71,7 +71,7 @@ def trade(test_mode):
             return
         else:
             symbol = alt+"BTC"
-            qty = d.get_asset_free_balance("BTC")
+            qty = int(d.get_asset_free_balance("BTC"))
             #btc_price = d.get_current_price("BTCUSDT")
             #default buy amt is minimum transaction value of 0.0001 btc 
             if qty < 0.00011:
@@ -94,7 +94,7 @@ def trade(test_mode):
             return
         else:
             symbol = alt+"BTC"
-            qty = d.get_asset_free_balance(alt)
+            qty = int(d.get_asset_free_balance(alt))
             order_qty = round(qty/2,5)
             price = d.get_current_price(symbol)
             if price * order_qty < 0.0001:
