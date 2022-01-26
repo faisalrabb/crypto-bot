@@ -35,7 +35,7 @@ def main():
         #    else:
         #        continue
         print("Calling trade")
-        print(dt.timezone.now())
+        print(dt.datetime.now())
         trade(args.t) 
         report()
 
