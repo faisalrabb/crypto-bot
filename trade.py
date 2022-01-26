@@ -13,6 +13,8 @@ with open('config/config.json', 'r') as config:
     client = Client(configs["api"], configs["secret"])
     alts = configs["alts"]
 
+#lot size tracker
+lot_size = {}
 #set the starting BTC investment given to the bot (for reporting purposes - see gain/loss by the bot against if you had just HODLed). This is of course optional, but if no value is supplied the report() function should be removed
 starting_amt_btc = 0.00189
 #rate limiting buys and reports - don't touch these. 
@@ -75,6 +77,10 @@ def trade(test_mode):
             return
         else:
             symbol = alt+"BTC"
+            bap = get_lot_size(symbol)
+            if bap is None:
+                print("something went wrong, invalid trading pair")
+                return
             qty = float(d.get_asset_free_balance("BTC"))
             #btc_price = d.get_current_price("BTCUSDT")
             #default buy amt is minimum transaction value of 0.0001 btc 
@@ -83,7 +89,7 @@ def trade(test_mode):
             else:
                 btc_qty = 0.0001100
             price = float(d.get_current_price(symbol))
-            order_qty=round(btc_qty/price,7)
+            order_qty=round(btc_qty/price,bap)
             if test_mode:
                 print(alt, order_qty, price)
                 #TODO: test logs 
@@ -99,6 +105,10 @@ def trade(test_mode):
             return
         else:
             symbol = alt+"BTC"
+            bap = get_lot_size(symbol)
+            if bap is None:
+                print("something went wrong, invalid trading pair")
+                return
             qty = float(d.get_asset_free_balance(alt))
             order_qty = round(qty/2,7)
             price = float(d.get_current_price(symbol))
@@ -106,7 +116,7 @@ def trade(test_mode):
                 if price * qty < 0.0001:
                     return
                 else:
-                    order_qty = round(0.0001/price,5)
+                    order_qty = round(0.0001/price,bap)
             order = client.limit_order_sell(symbol=symbol, quantity=order_qty, price=price)
             d.log_transaction(alt,"sell",price, (price * order_qty), order_qty)
 
@@ -143,6 +153,20 @@ def get_last_24h(buy_or_sell):
             else:
                 return alts
     return alts
+
+def get_lot_size(symbol): 
+    global lot_size
+    if symbol not in lot_size.keys():
+        with open('config/lot_size.json', 'r') as ls:
+            data = json.load(ls)
+            for ds in data["symbols"]:
+                if ds["symbol"] = symbol:
+                    bap = ds["baseAssetPrecision"]
+            lot_size[symbol] = bap
+            return bap
+    else:
+        return lot_size[symbol]
+    return None
 
 def choose_alt_buy():
     global next_buytime
