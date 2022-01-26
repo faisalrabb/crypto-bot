@@ -18,8 +18,8 @@ starting_amt_btc = 0.00189
 #rate limiting buys and reports - don't touch these. 
 next_buytime = 0
 next_report = 0
-#auto-start function while waiting for initial BTC buy order to fill - don't touch
-start_trading = False 
+#auto-start function while waiting for initial BTC buy order to fill (if account has no BTC)- to use this, uncomment the following line and the commented out lines in the main function
+#start_trading = False 
 
 def main():
     global start_trading
@@ -27,14 +27,15 @@ def main():
     parser.add_argument('--t', required=False, dest='t', action='store_true', help="use --t flag for testing mode (transactions are not sent to Binance API)")
     args = parser.parse_args()
     while True:
-        if start_trading == False:
-            balances = d.get_asset_balances()
-            if len(balances) != 0:
-                start_trading = True
-        else:
-            trade(args.t) 
-            report()
-        time.sleep(120)
+        time.sleep(120) #set to run every 2 minutes to minimize system usage (no advantage is gained from running at smaller interval)
+        #if start_trading == False:
+        #    balances = d.get_asset_balances()
+        #    if len(balances) != 0:
+        #        start_trading = True
+        #    else:
+        #        continue
+        trade(args.t) 
+        report()
 
 def report():
     global next_report
