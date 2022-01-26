@@ -34,6 +34,8 @@ def main():
         #        start_trading = True
         #    else:
         #        continue
+        print("Calling trade")
+        print(dt.timezone.now())
         trade(args.t) 
         report()
 
@@ -80,7 +82,7 @@ def trade(test_mode):
                 return
             else:
                 btc_qty = 0.0001100
-            price = d.get_current_price(symbol)
+            price = float(d.get_current_price(symbol))
             order_qty=round(btc_qty/price,7)
             if test_mode:
                 print(alt, order_qty, price)
@@ -98,8 +100,8 @@ def trade(test_mode):
         else:
             symbol = alt+"BTC"
             qty = float(d.get_asset_free_balance(alt))
-            order_qty = round(qty/2,5)
-            price = d.get_current_price(symbol)
+            order_qty = round(qty/2,7)
+            price = float(d.get_current_price(symbol))
             if price * order_qty < 0.0001:
                 if price * qty < 0.0001:
                     return
