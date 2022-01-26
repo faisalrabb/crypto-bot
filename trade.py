@@ -66,12 +66,13 @@ def init_report():
 def trade(test_mode):
     global next_buytime
     if buy():
+        print("buy time")
         alt = choose_alt_buy()
         if alt is None:
             return
         else:
             symbol = alt+"BTC"
-            qty = int(d.get_asset_free_balance("BTC"))
+            qty = float(d.get_asset_free_balance("BTC"))
             #btc_price = d.get_current_price("BTCUSDT")
             #default buy amt is minimum transaction value of 0.0001 btc 
             if qty < 0.00011:
@@ -89,12 +90,13 @@ def trade(test_mode):
             d.log_transaction(alt, "buy", price, btc_qty, order_qty)
             next_buytime = dt.datetime.now() + dt.timedelta(minutes=15)
     elif sell():
+        print("sell time")
         alt = choose_alt_sell()
         if alt is None:
             return
         else:
             symbol = alt+"BTC"
-            qty = int(d.get_asset_free_balance(alt))
+            qty = float(d.get_asset_free_balance(alt))
             order_qty = round(qty/2,5)
             price = d.get_current_price(symbol)
             if price * order_qty < 0.0001:
