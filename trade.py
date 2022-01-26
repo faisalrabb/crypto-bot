@@ -18,11 +18,11 @@ starting_amt_btc = 0.00189
 #rate limiting buys and reports - don't touch these. 
 next_buytime = 0
 next_report = 0
-#auto-start function while waiting for initial BTC buy order to fill (if account has no BTC)- to use this, uncomment the following line and the commented out lines in the main function
+#auto-start function while waiting for initial BTC buy order to fill (for when account has no BTC)- to use this, uncomment the following line and the commented out lines in the main function
 #start_trading = False 
 
 def main():
-    global start_trading
+    #global start_trading
     parser = argparse.ArgumentParser()
     parser.add_argument('--t', required=False, dest='t', action='store_true', help="use --t flag for testing mode (transactions are not sent to Binance API)")
     args = parser.parse_args()
@@ -81,7 +81,7 @@ def trade(test_mode):
             else:
                 btc_qty = 0.0001100
             price = d.get_current_price(symbol)
-            order_qty=round(btc_qty/price,5)
+            order_qty=round(btc_qty/price,7)
             if test_mode:
                 print(alt, order_qty, price)
                 #TODO: test logs 
