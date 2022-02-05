@@ -191,7 +191,6 @@ def get_avg_buy_price(alt):
 
 
 def log_transaction(alt, side, price_btc, quantity_btc, quantity_alt):
-    print(alt + " " + side + " "+ str(price_btc) + " " + str(quantity_btc)+"BTC " + quantity_alt+alt)
     #buy side quantity_btc = total btc sold, quantity_alt = total alt received
     #sell side quantity_btc = total btc received, quantity_alt = total alt sold
     side = side.lower()
@@ -199,6 +198,7 @@ def log_transaction(alt, side, price_btc, quantity_btc, quantity_alt):
     with open("transactions.log", 'a') as t:
         writer = csv.writer(t)
         writer.writerow([alt, side, str(price_btc), str(quantity_btc), str(quantity_alt), time])
+    print(alt + " " + side + " "+ str(price_btc) + " " + str(quantity_btc)+"BTC " + str(quantity_alt)+alt)
 
 
 if __name__=="__main__":
