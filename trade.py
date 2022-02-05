@@ -168,7 +168,8 @@ def get_lot_size(symbol):
                     decimal =False
                     for i in bap:
                         if i == '1':
-                            ls += 1
+                            if decimal:
+                                ls += 1
                             break
                         elif i == '.':
                             decimal=True
