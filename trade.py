@@ -29,7 +29,7 @@ def main():
     parser.add_argument('--t', required=False, dest='t', action='store_true', help="use --t flag for testing mode (transactions are not sent to Binance API)")
     args = parser.parse_args()
     while True:
-        #time.sleep(120) #set to run every 2 minutes to minimize system usage (no advantage is gained from running at smaller interval)
+        time.sleep(120) #set to run every 2 minutes to minimize system usage (no advantage is gained from running at smaller interval)
         #if start_trading == False:
         #    balances = d.get_asset_balances()
         #    if len(balances) != 0:
@@ -114,6 +114,7 @@ def trade(test_mode):
             qty = float(d.get_asset_free_balance(alt))
             order_qty = round(qty/2,7)
             price = float(d.get_current_price(symbol))
+            price = format(price, '.8f')
             if price * order_qty < 0.0001:
                 if price * qty < 0.0001:
                     return
