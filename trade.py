@@ -163,9 +163,21 @@ def get_lot_size(symbol):
             data = json.load(ls)
             for ds in data["symbols"]:
                 if ds["symbol"] == symbol:
-                    bap = int(ds["baseAssetPrecision"])
-            lot_size[symbol] = bap
-            return bap
+                    bap = ds["stepSize"]
+                    ls = 0:
+                    decimal =False
+                    for i in bap:
+                        if i == '1':
+                            ls += 1
+                            break
+                        elif i == '.':
+                            decimal=True
+                            continue
+                        else:
+                            if decimal==True:
+                                ls+= 1
+            lot_size[symbol] = ls
+            return ls
     else:
         return lot_size[symbol]
     return None
