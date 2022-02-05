@@ -29,7 +29,7 @@ def main():
     parser.add_argument('--t', required=False, dest='t', action='store_true', help="use --t flag for testing mode (transactions are not sent to Binance API)")
     args = parser.parse_args()
     while True:
-        time.sleep(120) #set to run every 2 minutes to minimize system usage (no advantage is gained from running at smaller interval)
+        #time.sleep(120) #set to run every 2 minutes to minimize system usage (no advantage is gained from running at smaller interval)
         #if start_trading == False:
         #    balances = d.get_asset_balances()
         #    if len(balances) != 0:
@@ -163,8 +163,8 @@ def get_lot_size(symbol):
             data = json.load(ls)
             for ds in data["symbols"]:
                 if ds["symbol"] == symbol:
-                    bap = ds["stepSize"]
-                    ls = 0:
+                    bap = ds["filters"][2]["stepSize"]
+                    ls = 0
                     decimal =False
                     for i in bap:
                         if i == '1':
