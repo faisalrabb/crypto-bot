@@ -88,7 +88,7 @@ def trade(test_mode):
                 return
             else:
                 btc_qty = 0.0001100
-            price = float(d.get_current_price(symbol))
+            price = format(float(d.get_current_price(symbol)), '.8f')
             order_qty=round(btc_qty/price,bap)
             print(price, order_qty, alt)
             if test_mode:
