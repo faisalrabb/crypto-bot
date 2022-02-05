@@ -114,7 +114,7 @@ def trade(test_mode):
             qty = float(d.get_asset_free_balance(alt))
             order_qty = round(qty/2,7)
             price = float(d.get_current_price(symbol))
-            price = format(price, '.8f')
+            price = format(price, '.8f')g
             if price * order_qty < 0.0001:
                 if price * qty < 0.0001:
                     return
