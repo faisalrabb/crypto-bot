@@ -50,7 +50,7 @@ def report():
             return
     if not os.path.exists("transactions.log"):
         return
-    time = dt.datetime.now.strftime("%d/%m/%Y %H:%M:%S")
+    time = dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     value_of_portfolio = d.get_account_balance_USD()
     value_of_btc = starting_amt_btc * d.get_current_price("BTCBUSD")
     gain = ((value_of_portfolio - value_of_btc)/value_of_btc)*100
