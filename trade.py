@@ -149,7 +149,7 @@ def get_last_24h(buy_or_sell):
             if row[1] != buy_or_sell:
                 continue
             time = row[-1]
-            time_obj = dt.datetime.striptime(time, "%d/%m/%Y %H:%M:%S")
+            time_obj = dt.datetime.strptime(time, "%d/%m/%Y %H:%M:%S")
             now = dt.datetime.now()
             if now - dt.timedelta(hours=24) <= time_obj <= now:
                 alts.append(row[0])
