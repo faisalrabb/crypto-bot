@@ -47,6 +47,6 @@ To measure the success of this bot, we look at the percentage gain/loss of the t
 
 This bot will be deployed with CAD$100 worth of BTC, and its performance metrics will be monitored and made publicly available.
 
-When testing is concluded and the bot is deployed on an AWS EC2 instance, the portfolio_value.csv file will be uploaded daily with data for my configuration. 
+When testing is concluded and the bot is deployed on an AWS EC2 instance, the portfolio_value.csv file will be uploaded daily to Pastebin with data for my configuration. [Click here to access this data](https://pastebin.com/pmQ53cpf)
 
 Please note that this is not a high-frequency trading bot and so performance should be evaluated on a longer-term basis. 

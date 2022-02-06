@@ -15,7 +15,8 @@ with open('config/config.json', 'r') as config:
     cmc_api = configs["cmc"]
 
 def main():
-    print(get_account_balance_USD())
+    pass
+    #print(get_account_balance_USD())
 
 def get_timestamp(days_ago):
     timest = dt.datetime.now()-dt.timedelta(days=days_ago)
@@ -141,7 +142,7 @@ def get_account_balance_USD():
         if ticker == "USDT":
             continue
         total = float(coin["free"]) + float(coin["locked"])
-        print(total)
+        #print(total)
         symbol = ticker+"BUSD"
         price = get_current_price(symbol)
         balance_USD += price * total
