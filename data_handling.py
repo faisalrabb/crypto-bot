@@ -16,7 +16,6 @@ with open('config/config.json', 'r') as config:
 
 def main():
     pass
-    #print(get_account_balance_USD())
 
 def get_timestamp(days_ago):
     timest = dt.datetime.now()-dt.timedelta(days=days_ago)
@@ -85,7 +84,18 @@ def get_metrics_latest():
 
 def get_btc_dominance_change():
     data = get_metrics_latest()
-    return data["data"]["btc_dominance_24h_percentage_change"]
+    try:
+        result = data["data"]["btc_dominance_24h_percentage_change"]
+    except KeyError:
+        return btc_dom_change()
+    return result
+
+def btc_dom_change():
+    r=requests.get('https://nomics.com/assets/btcdom-btc-dominance')
+    soup = bs4(r.content, 'html.parser')
+    data = soup.find_all('span', {'class':'flex flex-wrap mono'})
+    return(float(data[1].text[1:5]))
+
 
 
 def get_btc_dominance():

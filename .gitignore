@@ -1,4 +1,4 @@
 config/config.json
 bot.pem
 transactions.log
-
+portfolio_value.csv
