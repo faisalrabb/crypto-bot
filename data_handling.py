@@ -15,7 +15,8 @@ with open('config/config.json', 'r') as config:
     cmc_api = configs["cmc"]
 
 def main():
-    pass
+    print(btc_dom_change())
+    #pass
 
 def get_timestamp(days_ago):
     timest = dt.datetime.now()-dt.timedelta(days=days_ago)
@@ -94,7 +95,7 @@ def btc_dom_change():
     r=requests.get('https://nomics.com/assets/btcdom-btc-dominance')
     soup = bs4(r.content, 'html.parser')
     data = soup.find_all('span', {'class':'flex flex-wrap mono'})
-    return(float(data[1].text[1:5]))
+    return(float(data[1].text[1:-1]))
 
 
 
