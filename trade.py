@@ -38,7 +38,10 @@ def main():
         #        continue
         print("Calling trade")
         print(dt.datetime.now())
-        trade(args.t) 
+        try:
+            trade(args.t)
+        except:
+            print("Remote resource error - restarting")
         report()
 
 def report():

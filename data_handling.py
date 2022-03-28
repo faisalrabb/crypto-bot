@@ -92,11 +92,11 @@ def get_btc_dominance_change():
     return result
 
 def btc_dom_change():
-    r=requests.get('https://nomics.com/assets/btcdom-btc-dominance')
+    r=requests.get('https://coincodex.com/market-overview/')
     soup = bs4(r.content, 'html.parser')
-    data = soup.find_all('span', {'class':'flex flex-wrap mono'})
+    data = soup.find_all('div', {'class':'value-change'})
     try:
-        rs = float(data[1].text[1:-1])
+        rs = float(data[-1].text[0:5])
     except:
         print("No BTC Dominance data available")
         return 0.0
